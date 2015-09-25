@@ -219,7 +219,7 @@ Will result in all single-value references prefixed with "fig.", and all referen
 
 They can be YAML strings as well. In that case, prefix would be the same regardless of number of references.
 
-They can also be used with first character capitalized, i.e. `FigPrefix`, etc. In this case, these settings will override default reference capitailzation settings.
+They can also be used with first character capitalized, i.e. `FigPrefix`, etc. In this case, these settings will override default reference capitalization settings.
 
 #### LaTeX customization
 
