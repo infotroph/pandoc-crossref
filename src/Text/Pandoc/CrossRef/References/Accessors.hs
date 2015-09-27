@@ -20,3 +20,6 @@ secRefs' new r@References{secRefs=old} = (old, r{secRefs=new})
 
 supFigRefs' :: Accessor References RefMap
 supFigRefs' new r@References{supFigRefs=old} = (old, r{supFigRefs=new})
+
+supTblRefs' :: Accessor References RefMap
+supTblRefs' new r@References{supTblRefs=old} = (old, r{supTblRefs=new})

@@ -69,6 +69,16 @@ replaceBlocks opts (Div (label,_,_) [Table title align widths header cells])
                 RawInline (Format "tex") ("\\label{"++label++"}") : init title
               _  -> applyTemplate idxStr (init title) $ tableTemplate opts
     return $ Table title' align widths header cells
+  | not $ null title
+  , "suptbl:"`isPrefixOf` label
+  = do
+    idxStr <- replaceAttr opts label (init title) supTblRefs'
+    let title' =
+          case outFormat opts of
+              f | isFormat "latex" f ->
+                RawInline (Format "tex") ("\\label{"++label++"}") : init title
+              _  -> applyTemplate idxStr (init title) $ supTableTemplate opts
+    return $ Table title' align widths header cells
 replaceBlocks opts cb@(CodeBlock (label, classes, attrs) code)
   | not $ null label
   , "lst:" `isPrefixOf` label
@@ -132,6 +142,9 @@ divBlocks (Para (math@(Math DisplayMath _eq):c))
 divBlocks (table@(Table title _align _widths _header _cells))
   | not $ null title
   , Just label <- getRefLabel "tbl" [last title]
+  = Div (label,[],[]) [table]
+  | not $ null title
+  , Just label <- getRefLabel "suptbl" [last title]
   = Div (label,[],[]) [table]
 divBlocks x = x
 

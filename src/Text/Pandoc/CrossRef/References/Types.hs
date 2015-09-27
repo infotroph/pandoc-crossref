@@ -21,6 +21,7 @@ data References = References { imgRefs :: RefMap
                              , supFigRefs :: RefMap
                              , eqnRefs :: RefMap
                              , tblRefs :: RefMap
+                             , supTblRefs :: RefMap
                              , lstRefs :: RefMap
                              , secRefs :: RefMap
                              , curChap :: [Int]
@@ -30,5 +31,5 @@ data References = References { imgRefs :: RefMap
 type WS a = State References a
 
 instance Default References where
-  def = References n n n n n n []
+  def = References n n n n n n n []
     where n = M.empty

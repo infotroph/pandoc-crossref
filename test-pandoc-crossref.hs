@@ -40,6 +40,10 @@ main = hspec $ do
         testBlocks (table' "Test table" "table")
         (table' "Table 1: Test table" [],
           def{tblRefs=M.fromList $ refRec' "tbl:table" 1 "Test table"})
+      it "Labels supp tables" $
+        testBlocks (suptable' "Test table" "table")
+        (suptable' "Table S1: Test table" [],
+          def{supTblRefs=M.fromList $ refRec' "suptbl:table" 1 "Test table"})
       it "Labels code blocks" $
         testBlocks (codeBlock' "Test code block" "codeblock")
         (codeBlockDiv "Listing 1: Test code block" "codeblock",
@@ -71,6 +75,10 @@ main = hspec $ do
         testRefs' "tbl:" [1] [4] tblRefs' "tbl.\160\&4"
       it "References multiple tables" $
         testRefs' "tbl:" [1..3] [4..6] tblRefs' "tbls.\160\&4-6"
+      it "References one supp table" $
+        testRefs' "suptbl:" [1] [4] supTblRefs' "tbl. S\&4"
+      it "References multiple supp tables" $
+        testRefs' "suptbl:" [1..3] [4..6] supTblRefs' "tbls. S\&4-6"
       it "References one listing" $
         testRefs' "lst:" [1] [4] lstRefs' "lst.\160\&4"
       it "References multiple listings" $
@@ -99,6 +107,10 @@ main = hspec $ do
         testRefs' "Tbl:" [1] [4] tblRefs' "Tbl.\160\&4"
       it "References multiple tables" $
         testRefs' "Tbl:" [1..3] [4..6] tblRefs' "Tbls.\160\&4-6"
+      it "References one sup table" $
+        testRefs' "Suptbl:" [1] [4] supTblRefs' "Tbl. S\&4"
+      it "References multiple tables" $
+        testRefs' "Suptbl:" [1..3] [4..6] supTblRefs' "Tbls. S\&4-6"
       it "References one listing" $
         testRefs' "Lst:" [1] [4] lstRefs' "Lst.\160\&4"
       it "References multiple listings" $
@@ -200,6 +212,11 @@ equation eq ref = para (displayMath eq <> ref' "eq" ref)
 
 table' :: String -> String -> Blocks
 table' title ref = table (text title <> ref' "tbl" ref) []
+   [para $ str "H1", para $ str "H2"]
+  [[para $ str "C1", para $ str "C2"]]
+
+suptable' :: String -> String -> Blocks
+suptable' title ref = table (text title <> ref' "suptbl" ref) []
    [para $ str "H1", para $ str "H2"]
   [[para $ str "C1", para $ str "C2"]]
 

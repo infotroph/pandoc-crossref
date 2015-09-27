@@ -2,10 +2,12 @@
 cref: False
 codeBlockCaptions: True
 figureTitle: "Figure \\#"
-supFigureTitle: "Figure S"
+supFigureTitle: "Supplementary Figure \\#\\ "
+supTableTitle: "Supplementary Table\\ "
 lofTitle: "## List of Figures"
 lotTitle: "## List of Tables"
 tableTemplate: "*$$tableTitle$$ $$i$$*$$titleDelim$$ $$t$$"
+supTableTemplate: "*$$supTableTitle$$ $$i$$*$$titleDelim$$ $$t$$"
 autoSectionLabels: True
 ---
 
@@ -21,7 +23,7 @@ It's possible to capitalize reference prefixes, like this: [@Fig:figure1].
 
 In case of multiple references, capitalization is determined by first reference. [@Fig:figure1; @fig:figure2] is capitalized, while [@fig:figure2; @Fig:figure1] is not.
 
-It is also possible to mix different references, like [@fig:figure1; @tbl:table1; @lst:captionAttr; @lst:tableCaption; @fig:figure2; @fig:figure3], which will be grouped in order they are specified. You can even intermix this with regular citations, although it's not recommended: [@fig:figure1; @tbl:table1; @unprocessedCitation]
+It is also possible to mix different references, like [@fig:figure1; @tbl:table1; @lst:captionAttr; @lst:tableCaption; @fig:figure2; @fig:figure3], which will be grouped in order they are specified. You can even intermix this with regular citations, although it's not recommended: [@fig:figure1; @tbl:table1; @unprocessedCitat; @suptbl:tableS1]
 
 # Chapter 1. Figures {#sec:sec1}
 
@@ -56,6 +58,15 @@ Table without caption:
 |:-------------|:--------------|
 | Content Cell | Content Cell  |
 | Content Cell | Content Cell  |
+
+Table numbered as supplement. Notice that the filter only cares that 'supplementary' materials get numbered separately from the others; they need not actually live in a different section of the document!
+
+| First Header | Second Header |
+|:-------------|:--------------|
+| Content Cell | Content Cell  |
+| Content Cell | Content Cell  |
+
+: Example of a supplementary table. {#suptbl:tableS1}
 
 # Chapter 4. Code blocks
 

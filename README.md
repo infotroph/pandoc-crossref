@@ -138,13 +138,23 @@ main = putStrLn "Hello World!"
 &lt;/div&gt;
 </pre>
 
-### Supplementary figures
+### Supplementary figures & tables
 
-Exactly like figures, but with a different name to allow independent numbering:
-
+Exactly like figures and tables above, but with a different name to allow independent numbering.
 ```markdown
 ![Caption](file.ext){#supfig:label}
+
+a   b   c
+--- --- ---
+1   2   3
+4   5   6
+
+: Caption {#suptbl:label}
 ```
+
+This feature *does not work* with LaTeX -- supplementary references are still given their custom prefix, but prefixes on captions are lost and the numbering doesn't distinguish between main and supplementary figures. Fixing this would probably require changes to the Pandoc writer so that it (defines and) uses a different float environment for each image/table/etc to be numbered; see [http://tex.stackexchange.com/questions/39315/how-to-change-the-numbering-for-different-figures].
+
+Note also a difference in whitespace: The template for non-supplementary material adds an automatic non-breaking space (`\\160`) between the prefix and the number, but the supplementary template does not. This is to alllow styles like `Fig. S1` rather than `Fig. S 1`. If you do want a space before the number, add it to your prefix, e.g. `pandoc -M supFigureTitle:"Supplementary Figure\\ "`.
 
 ### References
 

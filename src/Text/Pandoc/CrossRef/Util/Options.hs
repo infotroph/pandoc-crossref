@@ -18,6 +18,7 @@ data Options = Options { useCleveref :: Bool
                        , supFigPrefix :: Bool -> Int -> [Inline]
                        , eqnPrefix   :: Bool -> Int -> [Inline]
                        , tblPrefix   :: Bool -> Int -> [Inline]
+                       , supTblPrefix   :: Bool -> Int -> [Inline]
                        , lstPrefix   :: Bool -> Int -> [Inline]
                        , secPrefix   :: Bool -> Int -> [Inline]
                        , chapDelim   :: [Inline]
@@ -29,6 +30,7 @@ data Options = Options { useCleveref :: Bool
                        , figureTemplate :: Template
                        , supFigureTemplate :: Template
                        , tableTemplate  :: Template
+                       , supTableTemplate  :: Template
                        , listingTemplate :: Template
                        }
 
@@ -46,6 +48,7 @@ getOptions dtv fmt =
     , supFigPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "supFigPrefix"
     , eqnPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "eqnPrefix"
     , tblPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "tblPrefix"
+    , supTblPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "supTblPrefix"
     , lstPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "lstPrefix"
     , secPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "secPrefix"
     , chapDelim   = getMetaInlines "chapDelim" dtv
@@ -57,6 +60,7 @@ getOptions dtv fmt =
     , figureTemplate = makeTemplate dtv $ getMetaInlines "figureTemplate" dtv
     , supFigureTemplate = makeTemplate dtv $ getMetaInlines "supFigureTemplate" dtv
     , tableTemplate  = makeTemplate dtv $ getMetaInlines "tableTemplate" dtv
+    , supTableTemplate  = makeTemplate dtv $ getMetaInlines "supTableTemplate" dtv
     , listingTemplate = makeTemplate dtv $ getMetaInlines "listingTemplate" dtv
   }
 

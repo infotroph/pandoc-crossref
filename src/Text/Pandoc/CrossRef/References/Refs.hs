@@ -45,6 +45,7 @@ accMap = M.fromList [("fig:",imgRefs')
                     ,("supfig:",supFigRefs')
                     ,("eq:" ,eqnRefs')
                     ,("tbl:",tblRefs')
+                    ,("suptbl:",supTblRefs')
                     ,("lst:",lstRefs')
                     ,("sec:",secRefs')
                     ]
@@ -55,6 +56,7 @@ prefMap = M.fromList [("fig:",figPrefix)
                      ,("supfig:",supFigPrefix)
                      ,("eq:" ,eqnPrefix)
                      ,("tbl:",tblPrefix)
+                     ,("suptbl:",supTblPrefix)
                      ,("lst:",lstPrefix)
                      ,("sec:",secPrefix)
                      ]
@@ -65,7 +67,7 @@ prefixes = M.keys accMap
 getRefPrefix :: Options -> String -> Bool -> Int -> [Inline]
 getRefPrefix opts prefix capitalize num
   | null refprefix = []
-  | prefix == "supfig:" = refprefix
+  | "sup" `isPrefixOf` prefix = refprefix
   | otherwise   = refprefix ++ [Str "\160"]
   where refprefix = lookupUnsafe prefix prefMap opts capitalize num
 
