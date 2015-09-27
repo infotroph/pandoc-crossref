@@ -2,13 +2,14 @@
 cref: False
 codeBlockCaptions: True
 figureTitle: "Figure \\#"
+supFigureTitle: "Figure S"
 lofTitle: "## List of Figures"
 lotTitle: "## List of Tables"
 tableTemplate: "*$$tableTitle$$ $$i$$*$$titleDelim$$ $$t$$"
 autoSectionLabels: True
 ---
 
-This is a demo file for pandoc-crossref. With this filter, you can cross-reference figures (see [@fig:figure1;@fig:figure2;@fig:figure3]), display equations (see @eq:eqn1), tables (see [@tbl:table1]) and sections ([@sec:sec1; @sec:sec2; @sec:caption-attr; @sec:table-capts; @sec:wrapping-div])
+This is a demo file for pandoc-crossref. With this filter, you can cross-reference figures (see [@fig:figure1;@fig:figure2;@fig:figure3]) and separately-numbered supplemental figures (see @supfig:figure5), display equations (see @eq:eqn1), tables (see [@tbl:table1]) and sections ([@sec:sec1; @sec:sec2; @sec:caption-attr; @sec:table-capts; @sec:wrapping-div])
 
 For immediate example, see @fig:figure0
 
@@ -31,6 +32,10 @@ It is also possible to mix different references, like [@fig:figure1; @tbl:table1
 ![Third figure](img3.jpg){#fig:figure3}
 
 ![Unlabelled image](img1.jpg)
+
+
+![Supplementary figure](img5.jpg){#supfig:figure5}
+
 
 # Chapter 2. Equations {#sec:sec2}
 

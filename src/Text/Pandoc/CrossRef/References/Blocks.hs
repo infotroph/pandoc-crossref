@@ -39,6 +39,15 @@ replaceBlocks opts (Div (label,_,_) [Plain [Image alt img]])
             RawInline (Format "tex") ("\\label{"++label++"}") : alt
           _  -> applyTemplate idxStr alt $ figureTemplate opts
     return $ Para [Image alt' (fst img,"fig:")]
+  | "supfig:" `isPrefixOf` label
+  = do
+    idxStr <- replaceAttr opts label alt supFigRefs'
+    let alt' = case outFormat opts of
+          f | isFormat "latex" f ->
+            RawInline (Format "tex") ("\\label{"++label++"}") : alt
+          _  -> applyTemplate idxStr alt $ supFigureTemplate opts
+    -- Title must be "fig:" not "supfig:", else Pandoc won't treat as implicit figure
+    return $ Para [Image alt' (fst img,"fig:")]
 replaceBlocks opts (Div (label,_,_) [Plain [Math DisplayMath eq]])
   | "eq:" `isPrefixOf` label
   = case outFormat opts of
@@ -115,6 +124,8 @@ divBlocks :: Block -> Block
 divBlocks (Para (Image alt img:c))
   | Just label <- getRefLabel "fig" c
   = Div (label,[],[]) [Plain [Image alt (fst img, "fig:")]]
+  | Just label <- getRefLabel "supfig" c
+  = Div (label,[],[]) [Plain [Image alt (fst img, "supfig:")]]
 divBlocks (Para (math@(Math DisplayMath _eq):c))
   | Just label <- getRefLabel "eq" c
   = Div (label,[],[]) [Plain [math]]

@@ -10,12 +10,14 @@ import Text.Pandoc.Builder
 
 $(concat `fmap` mapM genSetting
   [ "figureTitle"
+  , "supFigureTitle"
   , "tableTitle"
   , "listingTitle"
   , "titleDelim"
   , "chapDelim"
   , "rangeDelim"
   , "figPrefix"
+  , "supFigPrefix"
   , "eqnPrefix"
   , "tblPrefix"
   , "lstPrefix"
@@ -24,6 +26,7 @@ $(concat `fmap` mapM genSetting
   , "lotTitle"
   , "lolTitle"
   , "figureTemplate"
+  , "supFigureTemplate"
   , "tableTemplate"
   , "listingTemplate"
   , "crossrefYaml"

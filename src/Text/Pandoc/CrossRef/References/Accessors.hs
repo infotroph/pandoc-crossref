@@ -17,3 +17,6 @@ lstRefs' new r@References{lstRefs=old} = (old, r{lstRefs=new})
 
 secRefs' :: Accessor References RefMap
 secRefs' new r@References{secRefs=old} = (old, r{secRefs=new})
+
+supFigRefs' :: Accessor References RefMap
+supFigRefs' new r@References{supFigRefs=old} = (old, r{supFigRefs=new})

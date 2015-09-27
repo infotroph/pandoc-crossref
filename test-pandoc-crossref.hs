@@ -28,6 +28,10 @@ main = hspec $ do
         testBlocks (figure "test.jpg" [] "Test figure" "figure")
         (figure "test.jpg" "fig:" "Figure 1: Test figure" [],
           def{imgRefs=M.fromList $ refRec' "fig:figure" 1 "Test figure"})
+      it "Labels supp images" $
+        testBlocks (supfigure "test.jpg" [] "Test figure" "figure")
+        (supfigure "test.jpg" "fig:" "Figure S1: Test figure" [],
+          def{supFigRefs=M.fromList $ refRec' "supfig:figure" 1 "Test figure"})
       it "Labels equations" $
         testBlocks (equation "a^2+b^2=c^2" "equation")
         (equation "a^2+b^2=c^2\\qquad(1)" [],
@@ -55,6 +59,10 @@ main = hspec $ do
         testRefs' "fig:" [1] [4] imgRefs' "fig.\160\&4"
       it "References multiple images" $
         testRefs' "fig:" [1..3] [4..6] imgRefs' "figs.\160\&4-6"
+      it "References one supp image" $
+        testRefs' "supfig:" [1] [4] supFigRefs' "fig. S\&4"
+      it "References multiple supp images" $
+        testRefs' "supfig:" [1..3] [4..6] supFigRefs' "figs. S\&4-6"
       it "References one equation" $
         testRefs' "eq:" [1] [4] eqnRefs' "eq.\160\&4"
       it "References multiple equations" $
@@ -79,6 +87,10 @@ main = hspec $ do
         testRefs' "Fig:" [1] [4] imgRefs' "Fig.\160\&4"
       it "References multiple images" $
         testRefs' "Fig:" [1..3] [4..6] imgRefs' "Figs.\160\&4-6"
+      it "References one supp image" $
+        testRefs' "Supfig:" [1] [4] supFigRefs' "Fig. S\&4"
+      it "References multiple supp images" $
+        testRefs' "Supfig:" [1..3] [4..6] supFigRefs' "Figs. S\&4-6"
       it "References one equation" $
         testRefs' "Eq:" [1] [4] eqnRefs' "Eq.\160\&4"
       it "References multiple equations" $
@@ -176,6 +188,9 @@ testList bs st res = runState (bottomUpM (References.List.listOf defaultOptions)
 
 figure :: String -> String -> String -> String -> Blocks
 figure src title alt ref = para (image src title (text alt) <> ref' "fig" ref)
+
+supfigure :: String -> String -> String -> String -> Blocks
+supfigure src title alt ref = para (image src title (text alt) <> ref' "supfig" ref)
 
 section :: String -> Int -> String -> Blocks
 section text' level label = headerWith ("sec:" ++ label,[],[]) level (text text')

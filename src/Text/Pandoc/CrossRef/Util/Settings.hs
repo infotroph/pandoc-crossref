@@ -23,12 +23,14 @@ getSettings meta = do
 defaultMeta :: Meta
 defaultMeta =
      figureTitle (str "Figure")
+  <> supFigureTitle (str "Figure" <> space <> str "S")
   <> tableTitle (str "Table")
   <> listingTitle (str "Listing")
   <> titleDelim (str ":")
   <> chapDelim (str ".")
   <> rangeDelim (str "-")
   <> figPrefix ([str "fig.", str "figs."])
+  <> supFigPrefix ([str "fig." <> space <> str "S", str "figs." <> space <> str "S"])
   <> eqnPrefix ([str "eq." , str "eqns."])
   <> tblPrefix ([str "tbl.", str "tbls."])
   <> lstPrefix ([str "lst.", str "lsts."])
@@ -37,6 +39,7 @@ defaultMeta =
   <> lotTitle (header 1 $ text "List of Tables")
   <> lolTitle (header 1 $ text "List of Listings")
   <> figureTemplate (var "figureTitle" <> space <> var "i" <> var "titleDelim" <> space <> var "t")
+  <> supFigureTemplate (var "supFigureTitle" <> var "i" <> var "titleDelim" <> space <> var "t")
   <> tableTemplate (var "tableTitle" <> space <> var "i" <> var "titleDelim" <> space <> var "t")
   <> listingTemplate (var "listingTitle" <> space <> var "i" <> var "titleDelim" <> space <> var "t")
   <> crossrefYaml (MetaString "pandoc-crossref.yaml")

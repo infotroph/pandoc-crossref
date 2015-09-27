@@ -15,6 +15,7 @@ data Options = Options { useCleveref :: Bool
                        , cbCaptions  :: Bool
                        , autoSecLab  :: Bool
                        , figPrefix   :: Bool -> Int -> [Inline]
+                       , supFigPrefix :: Bool -> Int -> [Inline]
                        , eqnPrefix   :: Bool -> Int -> [Inline]
                        , tblPrefix   :: Bool -> Int -> [Inline]
                        , lstPrefix   :: Bool -> Int -> [Inline]
@@ -26,6 +27,7 @@ data Options = Options { useCleveref :: Bool
                        , lolTitle    :: [Block]
                        , outFormat   :: Maybe Format
                        , figureTemplate :: Template
+                       , supFigureTemplate :: Template
                        , tableTemplate  :: Template
                        , listingTemplate :: Template
                        }
@@ -41,6 +43,7 @@ getOptions dtv fmt =
     , cbCaptions  = getMetaBool "codeBlockCaptions" dtv
     , autoSecLab  = getMetaBool "autoSectionLabels" dtv
     , figPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "figPrefix"
+    , supFigPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "supFigPrefix"
     , eqnPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "eqnPrefix"
     , tblPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "tblPrefix"
     , lstPrefix   = tryCapitalizeM (flip (getMetaList toInlines) dtv) "lstPrefix"
@@ -52,6 +55,7 @@ getOptions dtv fmt =
     , lolTitle    = getMetaBlock "lolTitle" dtv
     , outFormat   = fmt
     , figureTemplate = makeTemplate dtv $ getMetaInlines "figureTemplate" dtv
+    , supFigureTemplate = makeTemplate dtv $ getMetaInlines "supFigureTemplate" dtv
     , tableTemplate  = makeTemplate dtv $ getMetaInlines "tableTemplate" dtv
     , listingTemplate = makeTemplate dtv $ getMetaInlines "listingTemplate" dtv
   }

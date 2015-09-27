@@ -42,6 +42,7 @@ replaceRefs _ x = return x
 -- accessors to state variables
 accMap :: M.Map String (Accessor References RefMap)
 accMap = M.fromList [("fig:",imgRefs')
+                    ,("supfig:",supFigRefs')
                     ,("eq:" ,eqnRefs')
                     ,("tbl:",tblRefs')
                     ,("lst:",lstRefs')
@@ -51,6 +52,7 @@ accMap = M.fromList [("fig:",imgRefs')
 -- accessors to options
 prefMap :: M.Map String (Options -> Bool -> Int -> [Inline])
 prefMap = M.fromList [("fig:",figPrefix)
+                     ,("supfig:",supFigPrefix)
                      ,("eq:" ,eqnPrefix)
                      ,("tbl:",tblPrefix)
                      ,("lst:",lstPrefix)
@@ -63,6 +65,7 @@ prefixes = M.keys accMap
 getRefPrefix :: Options -> String -> Bool -> Int -> [Inline]
 getRefPrefix opts prefix capitalize num
   | null refprefix = []
+  | prefix == "supfig:" = refprefix
   | otherwise   = refprefix ++ [Str "\160"]
   where refprefix = lookupUnsafe prefix prefMap opts capitalize num
 

@@ -138,6 +138,14 @@ main = putStrLn "Hello World!"
 &lt;/div&gt;
 </pre>
 
+### Supplementary figures
+
+Exactly like figures, but with a different name to allow independent numbering:
+
+```markdown
+![Caption](file.ext){#supfig:label}
+```
+
 ### References
 
 ```markdown
@@ -183,10 +191,12 @@ Following variables are supported:
 * `listings`: if True, generate code blocks for `listings` package. Only relevant for LaTeX output. `\usepackage{listings}` will be automatically added to `header-includes`. You need to specify `--listings` option as well.
 * `codeBlockCaptions`: if True, parse table-style code block captions.
 * `figureTitle`, default `Figure`: Word(s) to prepend to figure titles, e.g. `Figure 1: Description`
+* `supFigureTitle`, default `Figure S`: Word(s) to prepend to supplementary figure titles, e.g. `Figure S1: Description`
 * `tableTitle`, default `Table`: Word(s) to prepend to table titles, e.g. `Table 1: Description`
 * `listingTitle`, default `Listing`: Word(s) to prepend to listing titles, e.g. `Listing 1: Description`
 * `titleDelimiter`, default `:`: What to put between object number and caption text.
 * `figPrefix`, default `fig.`, `figs.`: Prefix for references to figures, e.g. `figs. 1-3`
+* `supFigPrefix`, default `fig. S`, `figs. S`: Prefix for references to supplementary figures, e.g. `figs. S1-3`
 * `eqnPrefix`, default `eq.`, `eqns.`: Prefix for references to equations, e.g. `eqns. 3,4`
 * `tblPrefix`, default `tbl.`, `tbls.`: Prefix for references to tables, e.g. `tbl. 2`
 * `lstPrefix`, default `lst.`, `lsts.`: Prefix for references to lists, e.g. `lsts. 2,5`
@@ -198,10 +208,11 @@ Following variables are supported:
 * `lotTitle`, default `# List of Tables`: Title for list of tables (lot)
 * `lolTitle`, default `# List of Listings`: Title for list of listings (lol)
 * `figureTemplate`, default `\\[figureTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for figure captions, see [Templates](#templates)
+* `supFigureTemplate`, default `\\[supFigureTitle\\]\\[i\\]\\[titleDelim\\] \\[t\\]`: template for figure captions, see [Templates](#templates).
 * `tableTemplate`, default `\\[tableTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for table captions, see [Templates](#templates)
 * `listingTemplate`, default `\\[tableTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for listing captions, see [Templates](#templates)
 
-`figPrefix`, `eqnPrefix`, `tblPrefix`, `lstPrefix` can be YAML arrays. That way, value at index corresponds to total number of references in group, f.ex.
+`figPrefix`, `supFigPrefix`, `eqnPrefix`, `tblPrefix`, `lstPrefix` can be YAML arrays. That way, value at index corresponds to total number of references in group, f.ex.
 
 ```yaml
 figPrefix:
