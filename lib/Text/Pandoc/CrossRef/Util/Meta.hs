@@ -1,11 +1,13 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleContexts #-}
 module Text.Pandoc.CrossRef.Util.Meta where
 
-import Text.Pandoc (readMarkdown)
+import Text.Pandoc.CrossRef.Util.Gap
+import Text.Pandoc.CrossRef.Util.Util
 import Text.Pandoc.Shared (stringify)
 import Text.Pandoc.Definition
 import Data.Maybe (fromMaybe)
 import Data.Default
+import Text.Pandoc.Walk
 
 getMetaList :: (Default a) => (MetaValue -> Maybe a) -> String -> Meta -> Int -> a
 getMetaList f name meta i = fromMaybe def $ lookupMeta name meta >>= getList i >>= f
@@ -24,12 +26,7 @@ getMetaString name meta = fromMaybe [] $ lookupMeta name meta >>= toString
 
 toInlines :: MetaValue -> Maybe [Inline]
 toInlines (MetaString s) =
-#if MIN_VERSION_pandoc(1,14,0)
-  return $ getInlines $
-    either (error . show) id $ readMarkdown def s
-#else
   return $ getInlines $ readMarkdown def s
-#endif
   where getInlines (Pandoc _ bs) = concatMap getInline bs
         getInline (Plain ils) = ils
         getInline (Para ils) = ils
@@ -45,12 +42,7 @@ toBlocks :: MetaValue -> Maybe [Block]
 toBlocks (MetaBlocks bs) = return bs
 toBlocks (MetaInlines ils) = return [Plain ils]
 toBlocks (MetaString s) =
-#if MIN_VERSION_pandoc(1,14,0)
-  return $ getBlocks $
-    either (error . show) id $ readMarkdown def s
-#else
   return $ getBlocks $ readMarkdown def s
-#endif
   where getBlocks (Pandoc _ bs) = bs
 toBlocks _ = Nothing
 
@@ -67,3 +59,16 @@ getList i (MetaList l) = l !!? i
                    | not $ null list = Just $ last list
                    | otherwise = Nothing
 getList _ x = Just x
+
+tryCapitalizeM :: (Functor m, Monad m, Walkable Inline a, Default a, Eq a) =>
+        (String -> m a) -> String -> Bool -> m a
+tryCapitalizeM f varname capitalize
+  | capitalize = do
+    res <- f (capitalizeFirst varname)
+    case res of
+      xs | xs == def -> f varname >>= walkM capStrFst
+         | otherwise -> return xs
+  | otherwise  = f varname
+  where
+    capStrFst (Str s) = return $ Str $ capitalizeFirst s
+    capStrFst x = return x

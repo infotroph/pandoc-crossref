@@ -46,10 +46,12 @@ Example:
 >       <> chaptersDepth (MetaString "2")
 
 -}
+{-# LANGUAGE RankNTypes #-}
 
 module Text.Pandoc.CrossRef (
     crossRefBlocks
   , crossRefMeta
+  , defaultCrossRefAction
   , runCrossRef
   , runCrossRefIO
   , module SG
@@ -60,12 +62,11 @@ module Text.Pandoc.CrossRef (
 import Control.Monad.State
 import qualified Control.Monad.Reader as R
 import Text.Pandoc
-import Text.Pandoc.Walk
 import Data.Monoid ((<>))
 
 import Text.Pandoc.CrossRef.References
 import Text.Pandoc.CrossRef.Util.Settings
-import Text.Pandoc.CrossRef.Util.Options
+import Text.Pandoc.CrossRef.Util.Options as O
 import Text.Pandoc.CrossRef.Util.CodeBlockCaptions
 import Text.Pandoc.CrossRef.Util.ModifyMeta
 import Text.Pandoc.CrossRef.Util.Settings.Gen as SG
@@ -87,8 +88,8 @@ crossRefBlocks blocks = do
   opts <- R.asks creOptions
   let
     doWalk =
-      bottomUpM (codeBlockCaptions opts) (walk divBlocks blocks)
-      >>= walkM (replaceBlocks opts)
+      bottomUpM (mkCodeBlockCaptions opts) blocks
+      >>= replaceAll opts
       >>= bottomUpM (replaceRefs opts)
       >>= bottomUpM (listOf opts)
   return $ evalState doWalk def
@@ -105,10 +106,19 @@ crossRefMeta = do
   dtv <- R.asks creSettings
   return $ modifyMeta opts dtv
 
+{- | Combines 'crossRefMeta' and 'crossRefBlocks'
+
+Works in 'CrossRefM' monad. -}
+defaultCrossRefAction :: Pandoc -> CrossRefM Pandoc
+defaultCrossRefAction (Pandoc _ bs) = do
+  meta' <- crossRefMeta
+  bs' <- crossRefBlocks bs
+  return $ Pandoc meta' bs'
+
 {- | Run an action in 'CrossRefM' monad with argument, and return pure result.
 
 This is primary function to work with 'CrossRefM' -}
-runCrossRef :: (Walkable a b) => Meta -> Maybe Format -> (a -> CrossRefM b) -> a -> b
+runCrossRef :: forall a b. Meta -> Maybe Format -> (a -> CrossRefM b) -> a -> b
 runCrossRef meta fmt action arg = R.runReader (action arg) env
   where
     settings = meta <> defaultMeta
@@ -121,7 +131,7 @@ runCrossRef meta fmt action arg = R.runReader (action arg) env
 
 This function will attempt to read pandoc-crossref settings from settings
 file specified by crossrefYaml metadata field. -}
-runCrossRefIO :: (Walkable a b) => Meta -> Maybe Format -> (a -> CrossRefM b) -> a -> IO b
+runCrossRefIO :: forall a b. Meta -> Maybe Format -> (a -> CrossRefM b) -> a -> IO b
 runCrossRefIO meta fmt action arg = do
   settings <- getSettings meta
   let

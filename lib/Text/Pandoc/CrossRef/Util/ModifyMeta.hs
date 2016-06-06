@@ -22,14 +22,18 @@ modifyMeta opts meta
     headerInc (Just (MetaList x)) = MetaList $ x ++ incList
     headerInc (Just x) = MetaList $ x:incList
     incList = map MetaString $
+        subfig ++
         floatnames ++
         listnames  ++
-        [ x | x <- codelisting, not $ useListings opts] ++
+        [ x | x <- codelisting, not $ listings opts] ++
         lolcommand ++
-        [ x | x <- cleveref, useCleveref opts] ++
-        [ x | x <- cleverefCodelisting, useCleveref opts && not (useListings opts)] ++
+        [ x | x <- cleveref, cref opts] ++
+        [ x | x <- cleverefCodelisting, cref opts && not (listings opts)] ++
         []
       where
+        subfig = [
+            "\\usepackage{subfig}"
+          ]
         floatnames = [
             "\\AtBeginDocument{%"
           , "\\renewcommand*\\figurename{"++metaString "figureTitle"++"}"
@@ -51,7 +55,7 @@ modifyMeta opts meta
           , "\\floatname{codelisting}{"++metaString "listingTitle"++"}"
           ]
         lolcommand
-          | useListings opts = [
+          | listings opts = [
               "\\newcommand*\\listoflistings\\lstlistoflistings"
             , "\\AtBeginDocument{%"
             , "\\renewcommand*{\\lstlistlistingname}{"++metaString' "lolTitle"++"}"
@@ -64,10 +68,12 @@ modifyMeta opts meta
           , "\\crefname{table}" ++ prefix tblPrefix False
           , "\\crefname{equation}" ++ prefix eqnPrefix False
           , "\\crefname{listing}" ++ prefix lstPrefix False
+          , "\\crefname{section}" ++ prefix secPrefix False
           , "\\Crefname{figure}" ++ prefix figPrefix True
           , "\\Crefname{table}" ++ prefix tblPrefix True
           , "\\Crefname{equation}" ++ prefix eqnPrefix True
           , "\\Crefname{listing}" ++ prefix lstPrefix True
+          , "\\Crefname{section}" ++ prefix secPrefix True
           ]
         cleverefCodelisting = [
             "\\makeatletter"

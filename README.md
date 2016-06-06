@@ -1,4 +1,4 @@
-# pandoc-crossref filter ![](https://travis-ci.org/lierdakil/pandoc-crossref.svg?branch=master)
+# pandoc-crossref filter [![Build Status](https://travis-ci.org/lierdakil/pandoc-crossref.svg?branch=master)](https://travis-ci.org/lierdakil/pandoc-crossref)
 
 pandoc-crossref is a pandoc filter for numbering figures, equations, tables and cross-references to them.
 
@@ -23,7 +23,9 @@ You can also enable per-chapter numbering (as with `--chapters` for latex output
 [lpdf]: http://lierdakil.github.io/pandoc-crossref/output-listings.pdf
 
 
-Tested with pandoc 1.13.2 and 1.14.
+Tested with Pandoc 1.16.0.
+
+**NOTE**: pandoc-crossref versions 0.2.0 and up only support pandoc v1.16. You can still file issues with older versions, but please don't expect more than an occasional bugfix. Thank you for understanding.
 
 This work is inspired by [pandoc-fignos][1] and [pandoc-eqnos][2] by @tomduck.
 
@@ -31,6 +33,20 @@ This work is inspired by [pandoc-fignos][1] and [pandoc-eqnos][2] by @tomduck.
 [2]: https://github.com/tomduck/pandoc-eqnos
 
 This package tries to use latex labels and references if output type is LaTeX. It also tries to supplement rudimentary LaTeX configuration that should mimic metadata configuration by setting `header-includes` variable.
+
+## Caveats
+
+### LaTeX output and `--include-in-header`
+
+pandoc-crossref uses metadata variable `header-includes` to add LaTeX definitions to output. However, Pandoc's command line option `--include-in-header`/`-H` overrides this variable. If you need to use `--include-in-header`, add pandoc-crossref-specific definitions as well. See [LaTeX customization](#latex-customization) for more information.
+
+### pandoc-citeproc and pandoc-crossref
+
+Since pandoc-crossref uses the same citation syntax as pandoc-citeproc, you *have* to run former *before* latter. For example:
+
+```
+pandoc -F pandoc-crossref -F pandoc-citeproc file.md -o file.html
+```
 
 ## Syntax
 
@@ -46,7 +62,44 @@ To label an (implicit) figure, append `{#fig:label}` (with `label` being somethi
 
 This only works on implicit figures, i.e. an image occurring by itself in a paragraph (which will be rendered as a figure with caption by pandoc)
 
-Image block and label *can* be separated by one or more spaces.
+Image block and label *can not* be separated by spaces.
+
+#### Subfigures
+
+It's possible to group figures as subfigures. Basic syntax is as follows:
+
+```
+<div id="fig:figureRef">
+![subfigure 1 caption](image1.png){#fig:figureRefA}
+
+![subfigure 2 caption](image2.png){#fig:figureRefB}
+
+Caption of figure
+</div>
+```
+
+To sum up, subfigures are made with a div having a figure `id`. Contents of said div consist of several paragraphs. All but last paragraphs contain one subfigure each, with captions, images and (optionally) reference attributes. Last paragraph contains figure caption.
+
+Output is customizable, with metadata fields. See [Customization](#customization) for more information.
+
+Default settings will produce the following equivalent Markdown from example above:
+
+```
+<div id="fig:figureRef" class="subfigures">
+
+![a](image1.png){#fig:figureRefA}
+
+![b](image2.png){#fig:figureRefB}
+
+Figure 1: Caption of figure. a — subfigure 1 caption, b — subfigure 2
+caption
+
+</div>
+```
+
+References to subfigures will be rendered as `figureNumber (subfigureNumber)`, e.g., in this particular example, `[@fig:figureRefA]` will produce `fig. 1 (a)`.
+
+You can add `nocaption` class to an image to suppress subfigure caption altogether. Note that it will still be counted.
 
 ### Equation labels
 
@@ -55,8 +108,6 @@ $$ math $$ {#eq:label}
 ```
 
 To label a display equation, append `{#eq:label}` (with `label` being something unique to reference this equation by) immediately after math block.
-
-This only works if display math and label specification are in a paragraph of its own.
 
 Math block and label *can* be separated by one or more spaces.
 
@@ -82,6 +133,8 @@ You can also reference sections of any level. Section labels use native pandoc s
 ```
 
 You can also use `autoSectionLabels` variable to automatically prepend all section labels (automatically generated with pandoc included) with "sec:". Bear in mind that references can't contain periods, commas etc, so some auto-generated labels will still be unusable.
+
+WARNING: With LaTeX output, you have to invoke pandoc with `--number-sections`, otherwise section labels won't work. It's also advised with other output formats, since with no numbers in section titles, it would be hard to navigate anyway.
 
 ### Section reference labels
 
@@ -170,7 +223,7 @@ main = putStrLn "Hello World!"
 
 Reference syntax heavily relies on citation syntax. Basic reference is created by writing `@`, then basically desired label with prefix. It is also possible to reference a group of objects, by putting them into brackets with `;` as separator. Similar objects will be grouped in order of them appearing in citation brackets, and sequential reference numbers will be shortened, e.g. `1,2,3` will be shortened to `1-3`.
 
-You can capitalize first reference character to get capitalized prefix, e.g. `[@Fig:label1]` will produce `Fig. ...` by default. Capitalized prefixes are derived automatically by capitalizing first letter of every word in non-capitalized prefix, unless overriden with metadata settings. See [Customization](#Customization) for more information.
+You can capitalize first reference character to get capitalized prefix, e.g. `[@Fig:label1]` will produce `Fig. ...` by default. Capitalized prefixes are derived automatically by capitalizing first letter of every word in non-capitalized prefix, unless overriden with metadata settings. See [Customization](#customization) for more information.
 
 ### Lists
 
@@ -187,13 +240,27 @@ cabal update
 cabal install pandoc-crossref
 ```
 
+However, I highly recommend you use a sandbox for installation, e.g.
+
+```bash
+cabal update
+mkdir pandoc-crossref
+cd pandoc-crossref
+cabal sandbox init
+cabal install pandoc-crossref
+```
+
+This will get `pandoc-crossref` installed into `.cabal-sandbox/bin`. Pandoc will also be built, if it's not installed as a Haskell library system-wide. You might also want to install `pandoc-citeproc` in the same sandbox, if that's the case (`cabal install pandoc-citeproc`).
+
+For Windows users, there is a pre-built executable available at [releases page](https://github.com/lierdakil/pandoc-crossref/releases/latest). Bear in mind that it is a product of an automated build script, and as such, provided as-is, with zero guarantees.
+
 ## Usage
 
 Run pandoc with `--filter` option, passing path to pandoc-crossref executable, or simply `pandoc-crossref`, if it's in PATH:
 
 `pandoc --filter pandoc-crossref`
 
-If you installed with cabal, it's most likely located in `$HOME/.cabal/bin` on \*NIX systems, or in `%AppData%\cabal\bin` on Windows.
+If you installed with cabal, it's most likely located in `$HOME/.cabal/bin` on \*NIX systems, `$HOME/Library/Haskell/bin` on Macs, or in `%AppData%\cabal\bin` on Windows.
 
 ### Customization
 
@@ -209,7 +276,7 @@ Following variables are supported:
 * `figureTitle`, default `Figure`: Word(s) to prepend to figure titles, e.g. `Figure 1: Description`
 * `tableTitle`, default `Table`: Word(s) to prepend to table titles, e.g. `Table 1: Description`
 * `listingTitle`, default `Listing`: Word(s) to prepend to listing titles, e.g. `Listing 1: Description`
-* `titleDelimiter`, default `:`: What to put between object number and caption text.
+* `titleDelim`, default `:`: What to put between object number and caption text.
 * `figPrefix`, default `fig.`, `figs.`: Prefix for references to figures, e.g. `figs. 1-3`
 * `eqnPrefix`, default `eq.`, `eqns.`: Prefix for references to equations, e.g. `eqns. 3,4`
 * `tblPrefix`, default `tbl.`, `tbls.`: Prefix for references to tables, e.g. `tbl. 2`
@@ -223,7 +290,18 @@ Following variables are supported:
 * `lolTitle`, default `# List of Listings`: Title for list of listings (lol)
 * `figureTemplate`, default `\\[figureTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for figure captions, see [Templates](#templates)
 * `tableTemplate`, default `\\[tableTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for table captions, see [Templates](#templates)
-* `listingTemplate`, default `\\[tableTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for listing captions, see [Templates](#templates)
+* `listingTemplate`, default `\\[listingTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]`: template for listing captions, see [Templates](#templates)
+* `subfigureTemplate`, default `\\[figureTitle\\] \\[i\\]\\[titleDelim\\] \\[t\\]. \\[ccs\\]`: template for subfigure divs captions. See [Subfigures](#subfigures)
+* `subfigureChildTemplate`, default `\\[i\\]`: template for actual subfigure captions. See [Subfigures](#subfigures)
+* `ccsTemplate`, default `\\[i\\]\\[ccsLabelSep\\]\\[t\\]`: template for collected subfigure captions. See [Subfigures](#subfigures), [Templates](#templates)
+* `figLabels`, default unset: custom numbering scheme for figures. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `subfigLabels`, default `alpha a`: custom numbering scheme for subfigures. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `eqnLabels`, default unset: custom numbering scheme for equations. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `tblLabels`, default unset: custom numbering scheme for tables. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `lstLabels`, default unset: custom numbering scheme for listings. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `secLabels`, default unset: custom numbering scheme for sections. See [Custom Numbering Schemes](#custom-numbering-schemes)
+* `ccsDelim`, default `,&nbsp;`: delimiter for collected subfigure captions. See [Subfigures](#subfigures) and [Templates](#templates)
+* `ccsLabelSep`, default `&nbsp;—&nbsp;`: delimiter used between subfigure label and subfigure caption in collected captions. See [Subfigures](#subfigures) and [Templates](#templates)
 
 `figPrefix`, `eqnPrefix`, `tblPrefix`, `lstPrefix` can be YAML arrays. That way, value at index corresponds to total number of references in group, f.ex.
 
@@ -233,7 +311,7 @@ figPrefix:
   - "figs."
 ```
 
-Will result in all single-value references prefixed with "fig.", and all reference groups of two and more prefixed with "figs.":
+Will result in all single-value references prefixed with "fig.", and all reference groups of two and more will be prefixed with "figs.":
 
 ```markdown
 [@fig:one] -> fig. 1
@@ -277,6 +355,7 @@ Variables can be specified in YAML metadata block, or from command line (with `-
 
 * `i` -- object number, possibly with chapter number (if `chapter=True`)
 * `t` -- object caption, as given in source Markdown
+* `ccs` -- collected subfigure captions. Only applicable to `subfigureTemplate`. Collected captions will be separated by `ccsDelim` and individual captions will be printed with `ccsTemplate`. See [Subfigures](#subfigures)
 
 Please note that at the moment, templates are not supported with LaTeX/PDF output.
 
@@ -295,6 +374,8 @@ tblPrefix: "tbl."
 loftitle: "# Lista de figuras"
 lotTitle: "# Lista de tablas"
 ```
+
+pandoc-crossref will send this data to pandoc wrapped in lines of `---`. The YAML file's first line should specify a variable; it will not pass the variables if it is `---` or a blank line.
 
 One could use this with pandoc-crossref as follows:
 
